@@ -30,14 +30,10 @@ const userSchema = new mongoose.Schema({
     select: false
   }
 });
-
-
-// 🔐 Hash Password
 userSchema.statics.hashPassword = async function(password) {
   return await bcrypt.hash(password, 10);
 };
 
-// 🔑 Generate Token
 userSchema.methods.generateAuthToken = function() {
   return jwt.sign(
     { id: this._id },
@@ -45,5 +41,7 @@ userSchema.methods.generateAuthToken = function() {
     { expiresIn: '1d' }
   );
 };
-
+userSchema.methods.comparePassword = async function(password) {
+    return await bcrypt.compare(password, this.password);
+};
 module.exports = mongoose.model('User', userSchema);
