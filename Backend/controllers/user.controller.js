@@ -2,6 +2,8 @@ const { validationResult } = require('express-validator');
 const userModel = require('../models/user.model');
 const userService = require('../services/user.service');
 const blacklistTokenModel = require('../models/blacklistToken.model');
+
+
 // ================= REGISTER =================
 module.exports.registerUser = async (req, res, next) => {
 
@@ -23,6 +25,13 @@ module.exports.registerUser = async (req, res, next) => {
         });
 
         const token = user.generateAuthToken();
+
+        // 🍪 Set cookie
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        });
 
         res.status(201).json({
             token,
@@ -47,28 +56,30 @@ module.exports.loginUser = async (req, res, next) => {
     const { email, password } = req.body;
 
     try {
-        // 🔹 Find user
         const user = await userModel.findOne({ email }).select('+password');
 
-        // ❗ If user not found
         if (!user) {
             return res.status(401).json({
                 message: "Invalid email or password"
             });
         }
 
-        // 🔹 Compare password
         const isMatch = await user.comparePassword(password);
 
-        // ❗ If password incorrect
         if (!isMatch) {
             return res.status(401).json({
                 message: "Invalid email or password"
             });
         }
 
-        // 🔹 Generate token
         const token = user.generateAuthToken();
+
+        // 🍪 Set cookie
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 24 * 60 * 60 * 1000
+        });
 
         res.status(200).json({
             token,
@@ -79,21 +90,20 @@ module.exports.loginUser = async (req, res, next) => {
         console.log(err);
         next(err);
     }
-}
-//cookies set up
-    const token = user.generateAuthToken();
-    res.cookie('token', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 360000
-    })
-    module.exports.getUserProfile = async(req,res,next)=>{
-        res.status(200).json(req.user);
-    }
+};
 
-    module.exports.logoutUser = async(req,res,next)=>{
-        res.clearCookies('token');
-        const token = req.cookies.token ||
+
+// ================= PROFILE =================
+module.exports.getUserProfile = async (req, res, next) => {
+    res.status(200).json(req.user);
+};
+
+
+// ================= LOGOUT =================
+module.exports.logoutUser = async (req, res, next) => {
+    try {
+        const token =
+            req.cookies.token ||
             (req.headers.authorization &&
                 req.headers.authorization.split(' ')[1]);
 
@@ -103,7 +113,7 @@ module.exports.loginUser = async (req, res, next) => {
             });
         }
 
-        // 🔹 Add token to blacklist
+        // 🔹 Blacklist token
         await blacklistTokenModel.create({ token });
 
         // 🔹 Clear cookie
@@ -117,5 +127,4 @@ module.exports.loginUser = async (req, res, next) => {
         console.log(err);
         next(err);
     }
-
-    
+};
