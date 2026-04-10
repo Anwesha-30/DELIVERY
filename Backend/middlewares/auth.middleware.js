@@ -12,7 +12,7 @@ module.exports.authUser = async (req, res, next) => {
             });
         }
 
-        // 🔹 Extract token
+        // 🔹 Extract token from authheader
         const token = authHeader.split(' ')[1];
 
         // 🔹 Verify token
