@@ -1,29 +1,39 @@
 const { validationResult } = require('express-validator');
-const userModel = require('../models/user.model');
-const userService = require('../services/user.service');
+const captainModel = require('../models/captain.model');
+const captainService = require('../services/captain.services');
 const blacklistTokenModel = require('../models/blacklistToken.model');
 
-///register to create
-module.exports.registerUser = async (req, res, next) => {
+// ================= REGISTER CAPTAIN =================
+module.exports.registerCaptain = async (req, res, next) => {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
 
-    const { fullname, email, password } = req.body;
+    const { fullname, email, password, vehicle } = req.body;
 
     try {
-        const hashedPassword = await userModel.hashPassword(password);
-        //in the above line we made certain changes
-        const user = await userService.createUser({
+        const isCaptainAlreadyExist = await captainModel.findOne({ email });
+
+        if (isCaptainAlreadyExist) {
+            return res.status(400).json({ message: 'Captain already exists' });
+        }
+
+        const hashedPassword = await captainModel.hashPassword(password);
+
+        const captain = await captainService.createCaptain({
             firstname: fullname.firstname,
             lastname: fullname.lastname,
             email,
-            password: hashedPassword
+            password: hashedPassword,
+            color: vehicle.color,
+            plate: vehicle.plate,
+            capacity: vehicle.capacity,
+            vehicleType: vehicle.vehicleType
         });
 
-        const token = user.generateAuthToken();
+        const token = captain.generateAuthToken();
 
         // 🍪 Set cookie
         res.cookie('token', token, {
@@ -34,7 +44,7 @@ module.exports.registerUser = async (req, res, next) => {
 
         res.status(201).json({
             token,
-            user
+            captain
         });
 
     } catch (err) {
@@ -43,9 +53,8 @@ module.exports.registerUser = async (req, res, next) => {
     }
 };
 
-
-// ================= LOGIN =================
-module.exports.loginUser = async (req, res, next) => {
+// ================= LOGIN CAPTAIN =================
+module.exports.loginCaptain = async (req, res, next) => {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -55,15 +64,15 @@ module.exports.loginUser = async (req, res, next) => {
     const { email, password } = req.body;
 
     try {
-        const user = await userModel.findOne({ email }).select('+password');
+        const captain = await captainModel.findOne({ email }).select('+password');
 
-        if (!user) {
+        if (!captain) {
             return res.status(401).json({
                 message: "Invalid email or password"
             });
         }
 
-        const isMatch = await user.comparePassword(password);
+        const isMatch = await captain.comparePassword(password);
 
         if (!isMatch) {
             return res.status(401).json({
@@ -71,7 +80,7 @@ module.exports.loginUser = async (req, res, next) => {
             });
         }
 
-        const token = user.generateAuthToken();
+        const token = captain.generateAuthToken();
 
         // 🍪 Set cookie
         res.cookie('token', token, {
@@ -82,7 +91,7 @@ module.exports.loginUser = async (req, res, next) => {
 
         res.status(200).json({
             token,
-            user
+            captain
         });
 
     } catch (err) {
@@ -91,15 +100,14 @@ module.exports.loginUser = async (req, res, next) => {
     }
 };
 
-
 // ================= PROFILE =================
-module.exports.getUserProfile = async (req, res, next) => {
-    res.status(200).json(req.user);
+module.exports.getCaptainProfile = async (req, res, next) => {
+    // Return req.captain (assuming auth middleware sets it) or req.user if authUser is used.
+    res.status(200).json(req.captain || req.user); // fallback to req.user if reusing user auth
 };
 
-
 // ================= LOGOUT =================
-module.exports.logoutUser = async (req, res, next) => {
+module.exports.logoutCaptain = async (req, res, next) => {
     try {
         const token =
             req.cookies.token ||
