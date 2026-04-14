@@ -31,12 +31,12 @@ module.exports.registerUser = async (req, res, next) => {
             secure: process.env.NODE_ENV === 'production',
             maxAge: 24 * 60 * 60 * 1000 // 24 hours
         });
-
+//res status 202 checks
         res.status(201).json({
             token,
             user
         });
-
+//use TRY AND CATCH ERROR METHOD
     } catch (err) {
         console.log(err);
         next(err);
