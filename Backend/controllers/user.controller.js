@@ -22,7 +22,7 @@ module.exports.registerUser = async (req, res, next) => {
             email,
             password: hashedPassword
         });
-
+//cooment for generating AuthToken
         const token = user.generateAuthToken();
 
     // INITIALISE THE RESULT RES.COOKIE IN THE FOLLOWING MANNER
