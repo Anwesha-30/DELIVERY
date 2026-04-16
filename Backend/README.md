@@ -163,4 +163,5 @@ The API uses JWT (JSON Web Tokens) for authentication. Protected routes require 
 - **`BlacklistToken` (`blacklistToken.model.js`)**: Used to handle user logouts. When a user logs out, their current JWT token is stored in this collection to invalidate it. Documents in this collection automatically expire after 24 hours (matching the token validity) using a MongoDB TTL index.
 
 ### Services (`user.service.js`)
-Handles the core business logic, such as creating a user in the database, breaking down operations from the controller layer.
+Handles the core business logic, such as creating a user in the database, breaking down operations from the controller layer. BASICALLY IT IS IMPLEMENTED TO MEET THE USER SERVICES AND NEEDS
+
