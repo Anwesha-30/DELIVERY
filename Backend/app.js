@@ -3,6 +3,7 @@ dotenv.config();
 
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
@@ -12,26 +13,20 @@ connectToDb();
 
 // Routes
 const userRoutes = require('./routes/user.routes');
-const cookieParser = require('cookie-parser');
+const captainRoutes = require('./routes/captain.routes');
+
 // ================= MIDDLEWARE =================
-
-// Enable CORS
 app.use(cors());
-
-// Parse JSON body
 app.use(express.json());
-
-// Parse URL encoded data (optional but good)
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser())
-// ================= ROUTES =================
+app.use(cookieParser());
 
-// Test route
+// ================= ROUTES =================
 app.get('/', (req, res) => {
     res.send('Hello World');
 });
 
-// User routes
 app.use('/users', userRoutes);
 app.use('/captains', captainRoutes);
+
 module.exports = app;
