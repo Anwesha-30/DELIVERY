@@ -10,7 +10,7 @@ const app = express();
 // DB connection
 const connectToDb = require('./db/db');
 connectToDb();
-
+//already connected to mongodb
 // Routes
 const userRoutes = require('./routes/user.routes');
 const captainRoutes = require('./routes/captain.routes');
