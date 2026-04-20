@@ -164,4 +164,4 @@ The API uses JWT (JSON Web Tokens) for authentication. Protected routes require 
 
 ### Services (`user.service.js`)
 Handles the core business logic, such as creating a user in the database, breaking down operations from the controller layer. BASICALLY IT IS IMPLEMENTED TO MEET THE USER SERVICES AND NEEDS
-
+###  JUST LIKE WE WANT O PLACE A SPECIAL DEMAND
