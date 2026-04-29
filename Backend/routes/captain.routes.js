@@ -1,17 +1,11 @@
 const express = require('express');
 const router = express.Router();
-
-// 🔹 Validator
 const { body } = require('express-validator');
-
-// 🔹 Controller
 const captainController = require('../controllers/captain.controller');
 
 // 🔹 Auth Middleware
 const authMiddleware = require('../middlewares/auth.middleware');
 
-
-// ================= REGISTER CAPTAIN =================
 router.post(
   '/register',
   [
@@ -45,8 +39,6 @@ router.post(
   captainController.registerCaptain
 );
 
-
-// ================= LOGIN CAPTAIN =================
 router.post(
   '/login',
   [
