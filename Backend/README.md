@@ -162,6 +162,6 @@ The API uses JWT (JSON Web Tokens) for authentication. Protected routes require 
 - **`User` (`user.model.js`)**: Stores user details (fullname, email, password). Includes methods for hashing passwords (`hashPassword`), comparing passwords (`comparePassword`), and generating JWT tokens (`generateAuthToken`).
 - **`BlacklistToken` (`blacklistToken.model.js`)**: Used to handle user logouts. When a user logs out, their current JWT token is stored in this collection to invalidate it. Documents in this collection automatically expire after 24 hours (matching the token validity) using a MongoDB TTL index.
 
-### Services (`user.service.js`)
+### Services (`user.service.js`) provinding back to back services
 Handles the core business logic, such as creating a user in the database, breaking down operations from the controller layer. BASICALLY IT IS IMPLEMENTED TO MEET THE USER SERVICES AND NEEDS
 ###  JUST LIKE WE WANT O PLACE A SPECIAL DEMAND then we will use
